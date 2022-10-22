@@ -1,8 +1,12 @@
 package hw2_13.com.example.hw2_13.demo.staff_info;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Objects;
+
 public class Employee {
     public static int counter;
-    protected int id;
+    //protected int id;
     protected String name;
     protected String surname;
     protected String secondName;
@@ -22,10 +26,10 @@ public class Employee {
             throw new RuntimeException("ЗП не может быть отрицательной");
         }
 
-        id = counter++;
-        this.surname = surname;
-        this.name = name;
-        this.secondName = secondName;
+        //id = counter++;
+        this.surname = StringUtils.capitalize(surname.toLowerCase());
+        this.name = StringUtils.capitalize(name.toLowerCase());
+        this.secondName = StringUtils.capitalize(secondName.toLowerCase());
         this.department = department;
         this.salary = salary;
     }
@@ -42,9 +46,9 @@ public class Employee {
         return secondName;
     }
 
-    public int getId() {
+    /*public int getId() {
         return id;
-    }
+    }*/
 
     public int getDepartment() {
         return department;
@@ -72,7 +76,7 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "ID: " + getId() + " " + getSurname() + " " + getName() + " " + getSecondName() + ". Department: " + getDepartment() +
+        return getSurname() + " " + getName() + " " + getSecondName() + ". Department: " + getDepartment() +
                 ". Salary: " + getSalary();
     }
 
@@ -81,6 +85,21 @@ public class Employee {
     }
 
     public String getDataWithoutDepartment() {
-        return "id: " + getId() + " ФИО: " + getFullName() + " ЗП = " + getSalary();
+        return "ФИО: " + getFullName() + " ЗП = " + getSalary();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return department == employee.getDepartment() && Float.compare(employee.getSalary(), salary) == 0
+                && Objects.equals(name, employee.getName()) && Objects.equals(surname, employee.getSurname())
+                && Objects.equals(secondName, employee.getSecondName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, surname, secondName, department, salary);
     }
 }

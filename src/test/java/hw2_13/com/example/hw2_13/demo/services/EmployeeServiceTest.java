@@ -56,8 +56,23 @@ class EmployeeServiceTest {
     @ParameterizedTest
     @MethodSource("provideParamsForAddNewEmployeeTest")
     void addNewEmployee(String surname, String name, String secondName, int department, float salary, String expected) {
+        // Проверка того, что возвращается ожидаемая expected строка
         String actual = employeeService.addNewEmployee(surname, name, secondName, department, salary);
         assertEquals(expected, actual);
+
+        // Проверка того, что элемент действительно вошел в коллекцию после добавления
+        provideStartContent(); // добавляются еще 3 элемента Employee
+
+        // создаем ожидаемый List для сравнения с этими же Employee
+        List <Employee> employeeList = List.of(
+                new Employee(surname, name, secondName, department, salary),
+                new Employee("Sidorkin", "petr", "ivaNovich", 2, 45000),
+                new Employee("МосКВин", "иван", "Геннадьевич", 5, 180000),
+                new Employee("Sidorov", "ivan", "Ivanovich", 5, 150000)
+        );
+
+        // Проверяем, что листы из emploeeService и ожидаемый "эталонный" совпадают (порядок не имеет значения)
+        Assertions.assertThat(employeeService.getEmployeeList()).containsExactlyInAnyOrderElementsOf(employeeList);
     }
 
     @Test
@@ -71,44 +86,62 @@ class EmployeeServiceTest {
 
     public static Stream<Arguments> provideParamsForAddNewEmployeeTest() {
         return Stream.of(
-                Arguments.of("Sidorkin", "petr", "ivaNovich", 2, 45000, "Сотрудник: Sidorkin Petr Ivanovich ЗП = 45000.0 в отделе: 2 создан"),
-                Arguments.of("МосКВин", "иван", "Геннадьевич", 5, 180000, "Сотрудник: Москвин Иван Геннадьевич ЗП = 180000.0 в отделе: 5 создан"),
-                Arguments.of("Sidorov", "ivan", "Ivanovich", 5, 150000, "Сотрудник: Sidorov Ivan Ivanovich ЗП = 150000.0 в отделе: 5 создан")
+                Arguments.of("Fedorov", "petr", "ivaNovich", 2, 85000, "Сотрудник: Fedorov Petr Ivanovich ЗП = 85000.0 в отделе: 2 создан"),
+                Arguments.of("Головачев", "иван", "Геннадьевич", 5, 180000, "Сотрудник: Головачев Иван Геннадьевич ЗП = 180000.0 в отделе: 5 создан"),
+                Arguments.of("Kolesnikov", "ivan", "Ivanovich", 5, 550000, "Сотрудник: Kolesnikov Ivan Ivanovich ЗП = 550000.0 в отделе: 5 создан")
         );
     }
 
     @Test
-    void deleteEmployee() {
+    void deleteEmployeeTestReturnString() {
+        // Проверка возвращаемой строки при успешном удалении
         employeeService.addNewEmployee("Sidorkin", "petr", "ivaNovich", 2, 45000);
         String actual = employeeService.deleteEmployee("Sidorkin", "petr", "ivaNovich");
         String expected = "Успешно удалены записи Sidorkin Petr Ivanovich";
         assertEquals(actual, expected);
 
+        // Проверка возвращаемой строки, если не найден такой сотрудник
         actual = employeeService.deleteEmployee("Sidorkin", "petr", "ivaNovich");
         expected = "Не найден сотрудник Sidorkin petr ivaNovich";
         assertEquals(expected, actual);
     }
 
     @Test
+    void deleteEmployeeTestEmployeesListAFterDeleting() {
+        // Проверка содержания списка сотрудников в Map.values после удаления
+        provideStartContent(); // добавляем тестовый набор сотруников
+        employeeService.deleteEmployee("МосКВин", "иван", "Геннадьевич"); // удаляем одного
+
+        List <Employee> actualList = employeeService.getEmployeeList();
+
+        // создаем ожидаемый List для сравнения с этими же Employee (без удаленного)
+        List <Employee> expectedList = List.of(
+                new Employee("Sidorkin", "petr", "ivaNovich", 2, 45000),
+                new Employee("Sidorov", "ivan", "Ivanovich", 5, 150000)
+        );
+
+        // Проверяем, что листы из emploeeService и ожидаемый "эталонный" совпадают (порядок не имеет значения)
+        Assertions.assertThat(actualList).containsExactlyInAnyOrderElementsOf(expectedList);
+    }
+
+    @Test
     void getListByDep() {
         provideStartContent();
+        List <Employee> actualList = employeeService.getListByDep(5);
 
-        List<String> actualList = employeeService.getListByDep(5).stream()
-                .map(e->e.getSurname() + e.getName() + e.getSecondName() + e.getDepartment() + e.getSalary())
-                .collect(Collectors.toList());
-        List<String> expectedList = List.of(
-                "МосквинИванГеннадьевич5180000.0",
-                "SidorovIvanIvanovich5150000.0"
+        List <Employee> expectedList = List.of(
+                new Employee("МосКВин", "иван", "Геннадьевич", 5, 180000),
+                new Employee("Sidorov", "ivan", "Ivanovich", 5, 150000)
         );
-        assertEquals(expectedList, actualList);
+        Assertions.assertThat(actualList).containsExactlyInAnyOrderElementsOf(expectedList);
     }
 
     @Test
     void findEmployee() {
         provideStartContent();
-        Employee employee = employeeService.findEmployee("Sidorkin", "petr", "ivaNovich");
-        String actual = employee.getSurname()+employee.getName()+employee.getSecondName()+employee.getDepartment()+employee.getSalary();
-        String expected = "SidorkinPetrIvanovich245000.0";
+        Employee actual = employeeService.findEmployee("Sidorkin", "petr", "ivaNovich");
+
+        Employee expected = new Employee("Sidorkin", "petr", "ivaNovich", 2, 45000);
         assertEquals(expected, actual);
     }
 

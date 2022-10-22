@@ -38,12 +38,7 @@ public class EmployeeService {
             throw new EmployeeAlreadyAddedException("Такой сотрудник уже есть");
         }
 
-        Employee newEmployee = new Employee(
-                StringUtils.capitalize(surname.toLowerCase()),
-                StringUtils.capitalize(name.toLowerCase()),
-                StringUtils.capitalize(secondName.toLowerCase()),
-                department,
-                salary);
+        Employee newEmployee = new Employee(surname, name, secondName, department, salary);
 
         employees.put(keyFIO, newEmployee);
         return "Сотрудник: " + newEmployee.getSurname() + " " + newEmployee.getName() + " " + newEmployee.getSecondName() +
