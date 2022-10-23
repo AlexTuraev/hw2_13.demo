@@ -4,11 +4,10 @@ import hw2_13.com.example.hw2_13.demo.services.EmployeeService;
 import hw2_13.com.example.hw2_13.demo.staff_info.Employee;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -20,14 +19,15 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Optional<Employee> getEmployeeMaxSalaryByDep(int departmentId) {
-        return employeeService.getListByDep(departmentId)
+        //return employeeService.getListByDep(departmentId)
+        return employeeService.getEmployeeList()
                 .stream().filter(e -> e.getDepartment() == departmentId)
                 .max(Comparator.comparingDouble(employee -> employee.getSalary()));
     }
 
     @Override
     public Optional<Employee> getEmployeeMinSalaryByDep(int departmentId) {
-        return employeeService.getListByDep(departmentId)
+        return employeeService.getEmployeeList()
                 .stream().filter(e -> e.getDepartment() == departmentId)
                 .min(Comparator.comparingDouble(employee -> employee.getSalary()));
     }
@@ -35,6 +35,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     // Возвращает сех сотрудниковЮ отсортированных по отделам
     public List<Employee> getAllEmployees() {
+        Map <Integer, List <Employee>> resultMap = new HashMap<>();
         return employeeService.getEmployeeList()
                 .stream().sorted(Comparator.comparingInt(e -> e.getDepartment()))
                 .collect(Collectors.toList());
@@ -45,7 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (departmentId == -1) {
             return getAllEmployees();
         } else {
-            return employeeService.getListByDep(departmentId)
+            return employeeService.getEmployeeList()
                     .stream().filter(e -> e.getDepartment() == departmentId)
                     .collect(Collectors.toList());
         }

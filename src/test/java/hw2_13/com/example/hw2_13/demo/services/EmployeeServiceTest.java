@@ -55,9 +55,10 @@ class EmployeeServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideParamsForAddNewEmployeeTest")
-    void addNewEmployee(String surname, String name, String secondName, int department, float salary, String expected) {
+    void addNewEmployee(String surname, String name, String secondName, int department, float salary) {
         // Проверка того, что возвращается ожидаемая expected строка
-        String actual = employeeService.addNewEmployee(surname, name, secondName, department, salary);
+        Employee actual = employeeService.addNewEmployee(surname, name, secondName, department, salary);
+        Employee expected = new Employee(surname, name, secondName, department, salary);
         assertEquals(expected, actual);
 
         // Проверка того, что элемент действительно вошел в коллекцию после добавления
@@ -86,9 +87,9 @@ class EmployeeServiceTest {
 
     public static Stream<Arguments> provideParamsForAddNewEmployeeTest() {
         return Stream.of(
-                Arguments.of("Fedorov", "petr", "ivaNovich", 2, 85000, "Сотрудник: Fedorov Petr Ivanovich ЗП = 85000.0 в отделе: 2 создан"),
-                Arguments.of("Головачев", "иван", "Геннадьевич", 5, 180000, "Сотрудник: Головачев Иван Геннадьевич ЗП = 180000.0 в отделе: 5 создан"),
-                Arguments.of("Kolesnikov", "ivan", "Ivanovich", 5, 550000, "Сотрудник: Kolesnikov Ivan Ivanovich ЗП = 550000.0 в отделе: 5 создан")
+                Arguments.of("Fedorov", "petr", "ivaNovich", 2, 85000),
+                Arguments.of("Головачев", "иван", "Геннадьевич", 5, 180000),
+                Arguments.of("Kolesnikov", "ivan", "Ivanovich", 5, 550000)
         );
     }
 
@@ -96,14 +97,13 @@ class EmployeeServiceTest {
     void deleteEmployeeTestReturnString() {
         // Проверка возвращаемой строки при успешном удалении
         employeeService.addNewEmployee("Sidorkin", "petr", "ivaNovich", 2, 45000);
-        String actual = employeeService.deleteEmployee("Sidorkin", "petr", "ivaNovich");
-        String expected = "Успешно удалены записи Sidorkin Petr Ivanovich";
+        Employee actual = employeeService.deleteEmployee("Sidorkin", "petr", "ivaNovich");
+        Employee expected = new Employee("Sidorkin", "petr", "ivaNovich", 2, 45000);
         assertEquals(actual, expected);
 
         // Проверка возвращаемой строки, если не найден такой сотрудник
         actual = employeeService.deleteEmployee("Sidorkin", "petr", "ivaNovich");
-        expected = "Не найден сотрудник Sidorkin petr ivaNovich";
-        assertEquals(expected, actual);
+        assertNull(actual);
     }
 
     @Test

@@ -19,7 +19,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/add")
-    public String add(@RequestParam("surname") String surname,
+    public Employee add(@RequestParam("surname") String surname,
                         @RequestParam("name") String name,
                         @RequestParam("secondName") String secondName,
                         @RequestParam("department") int department,
@@ -28,7 +28,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/remove")
-    public String deleteEmployee(@RequestParam("surname") String surname,
+    public Employee deleteEmployee(@RequestParam("surname") String surname,
                       @RequestParam("name") String name,
                       @RequestParam("secondName") String secondName){
         return employeeService.deleteEmployee(surname, name, secondName);

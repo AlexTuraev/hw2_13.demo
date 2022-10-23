@@ -32,7 +32,7 @@ public class EmployeeService {
         }
     }
 
-    public String addNewEmployee(String surname, String name, String secondName, int department, float salary) {
+    public Employee addNewEmployee(String surname, String name, String secondName, int department, float salary) {
         String keyFIO = keyGenByFIO(surname, name, secondName);
         if (employees.containsKey(keyFIO)) {
             throw new EmployeeAlreadyAddedException("Такой сотрудник уже есть");
@@ -41,18 +41,18 @@ public class EmployeeService {
         Employee newEmployee = new Employee(surname, name, secondName, department, salary);
 
         employees.put(keyFIO, newEmployee);
-        return "Сотрудник: " + newEmployee.getSurname() + " " + newEmployee.getName() + " " + newEmployee.getSecondName() +
-                " ЗП = " + newEmployee.getSalary() + " в отделе: " + newEmployee.getDepartment() + " создан";
+
+        return newEmployee;
     }
 
     // Удаление элемента массива (сотрудника) по ФИО
-    public String deleteEmployee(String surname, String name, String secondName) {
+    public Employee deleteEmployee(String surname, String name, String secondName) {
         String keyFIO = keyGenByFIO(surname, name, secondName);
         Employee deletedEmployee = employees.remove(keyFIO);
         if (deletedEmployee != null) {
-            return "Успешно удалены записи " + deletedEmployee.getSurname() + " " + deletedEmployee.getName() + " " + deletedEmployee.getSecondName();
+            return deletedEmployee;
         } else {
-            return "Не найден сотрудник " + surname + " " + name + " " + secondName;
+            return null;
         }
     }
 
